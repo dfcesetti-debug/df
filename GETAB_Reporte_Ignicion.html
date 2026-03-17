@@ -454,14 +454,43 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ══════════════════════════════════════════════════════════════
-   ENTRY POINT — MyGeotab inyecta (elt, api) automáticamente.
-   El nombre "ignicionEnCarga" debe coincidir con addin_config.json
+   ENTRY POINT ESTÁNDAR — MyGeotab requiere este formato
    ══════════════════════════════════════════════════════════════ */
-geotab.addin.ignicionEnCarga = function(elt, api) {
-  _api = api;
-  setDefaultDates();
-  setStatus('Listo. Seleccioná un rango y ejecutá el reporte.', false);
+geotab.addin.request = function () {
+    return {
+        /**
+         * initialize se ejecuta una sola vez al cargar el add-in.
+         * @param {object} api - Objeto para llamadas a la base de datos.
+         * @param {object} state - Estado actual de la aplicación (usuario, grupo, etc).
+         * @param {function} callback - ¡CRÍTICO! Se debe llamar para finalizar la carga.
+         */
+        initialize: function (api, state, callback) {
+            _api = api; // Guardamos la API para usarla en runReport()
+            
+            try {
+                setDefaultDates();
+                setStatus('Listo. Seleccioná un rango y ejecutá el reporte.', false);
+                
+                // IMPORTANTE: Sin esta línea, Geotab muestra "Error al cargar"
+                callback(); 
+            } catch (err) {
+                showError("Error en inicialización: " + err);
+                callback(); // Incluso con error, llamamos al callback para que no se congele
+            }
+        },
+
+        /**
+         * focus se ejecuta cada vez que el usuario hace clic en la pestaña del add-in.
+         */
+        focus: function (api, state) {
+            // Aquí podrías refrescar datos automáticamente si quisieras
+        },
+
+        /**
+         * blur se ejecuta cuando el usuario sale de la pestaña.
+         */
+        blur: function (api, state) {
+            // Limpieza de intervalos o eventos si fuera necesario
+        }
+    };
 };
-</script>
-</body>
-</html>
