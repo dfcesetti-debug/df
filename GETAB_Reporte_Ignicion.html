@@ -2,138 +2,94 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Reporte Ignición en Carga — MyGeotab</title>
+<title>Ignición en Carga — MyGeotab Add-In</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
   body { background: #f5f7fa; color: #222; font-size: 13px; }
 
   #header {
-    background: #1a3a5c;
-    color: #fff;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    background: #1a3a5c; color: #fff;
+    padding: 14px 24px; display: flex; align-items: center; gap: 12px;
   }
-  #header h1 { font-size: 16px; font-weight: 600; }
-  #header span { font-size: 12px; opacity: 0.7; }
+  #header h1 { font-size: 15px; font-weight: 600; }
+  #header span { font-size: 11px; opacity: .7; }
 
   #controls {
-    background: #fff;
-    border-bottom: 1px solid #dde3ec;
-    padding: 10px 24px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
+    background: #fff; border-bottom: 1px solid #dde3ec;
+    padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
   }
   #controls label { font-size: 12px; color: #555; }
   #controls select, #controls input[type=date] {
-    border: 1px solid #cdd3db;
-    border-radius: 4px;
-    padding: 5px 8px;
-    font-size: 12px;
-    background: #fff;
+    border: 1px solid #cdd3db; border-radius: 4px;
+    padding: 5px 8px; font-size: 12px; background: #fff;
   }
-  #controls button {
-    background: #1a6fc4;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 16px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  #controls button:hover { background: #155aa0; }
+  .btn-run  { background: #1a6fc4; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 12px; cursor: pointer; }
+  .btn-run:hover  { background: #155aa0; }
+  .btn-csv  { background: #2d7a4f; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 12px; cursor: pointer; }
+  .btn-csv:hover  { background: #245f3e; }
+  .btn-run:disabled { background: #999; cursor: not-allowed; }
 
-  #kpis {
-    display: flex;
-    gap: 12px;
-    padding: 16px 24px;
-    flex-wrap: wrap;
-  }
+  #kpis { display: flex; gap: 12px; padding: 16px 24px; flex-wrap: wrap; }
   .kpi {
-    background: #fff;
-    border: 1px solid #dde3ec;
-    border-radius: 6px;
-    padding: 12px 20px;
-    min-width: 160px;
-    flex: 1;
+    background: #fff; border: 1px solid #dde3ec; border-radius: 6px;
+    padding: 12px 20px; min-width: 150px; flex: 1;
   }
   .kpi .kpi-label { font-size: 11px; color: #777; margin-bottom: 4px; }
   .kpi .kpi-value { font-size: 24px; font-weight: 700; }
-  .kpi.red .kpi-value { color: #c0392b; }
+  .kpi.red   .kpi-value { color: #c0392b; }
   .kpi.green .kpi-value { color: #1e7e34; }
-  .kpi.blue .kpi-value { color: #1a6fc4; }
+  .kpi.blue  .kpi-value { color: #1a6fc4; }
   .kpi.amber .kpi-value { color: #c07a00; }
 
-  #table-wrap {
-    padding: 0 24px 24px;
-    overflow-x: auto;
-  }
+  #table-wrap { padding: 0 24px 24px; overflow-x: auto; }
   table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border: 1px solid #dde3ec;
-    border-radius: 6px;
-    overflow: hidden;
-    font-size: 12px;
+    width: 100%; border-collapse: collapse; background: #fff;
+    border: 1px solid #dde3ec; font-size: 12px;
   }
   thead tr { background: #1a3a5c; color: #fff; }
-  thead th {
-    padding: 10px 12px;
-    text-align: left;
-    font-weight: 600;
-    white-space: nowrap;
-  }
+  thead th { padding: 10px 12px; text-align: left; white-space: nowrap; cursor: pointer; user-select: none; }
+  thead th:hover { background: #2a4f7a; }
   tbody tr:nth-child(even) { background: #f0f4fb; }
   tbody tr:hover { background: #e3ecf8; }
-  tbody td { padding: 9px 12px; border-bottom: 1px solid #eaeff6; white-space: nowrap; }
+  tbody td { padding: 8px 12px; border-bottom: 1px solid #eaeff6; white-space: nowrap; }
 
-  .badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .badge-red    { background: #fde8e8; color: #9b1c1c; }
-  .badge-green  { background: #def7ec; color: #03543f; }
-  .badge-gray   { background: #eee;    color: #555; }
-  .badge-amber  { background: #fef3c7; color: #78350f; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .b-red    { background: #fde8e8; color: #9b1c1c; }
+  .b-green  { background: #def7ec; color: #03543f; }
+  .b-amber  { background: #fef3c7; color: #78350f; }
+  .b-gray   { background: #eee;    color: #555; }
 
-  #loading {
-    padding: 40px 24px;
-    text-align: center;
-    color: #888;
-    font-size: 14px;
+  #status-bar {
+    padding: 10px 24px; font-size: 12px; color: #555;
+    background: #fff; border-bottom: 1px solid #dde3ec; min-height: 36px;
+    display: flex; align-items: center; gap: 8px;
   }
+  .spinner {
+    width: 14px; height: 14px; border: 2px solid #ccc;
+    border-top-color: #1a6fc4; border-radius: 50%;
+    animation: spin .7s linear infinite; display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   #error-msg {
-    background: #fde8e8;
-    color: #9b1c1c;
-    padding: 12px 24px;
-    margin: 0 24px;
-    border-radius: 6px;
-    display: none;
+    background: #fde8e8; color: #9b1c1c;
+    padding: 10px 24px; margin: 0 24px 12px;
+    border-radius: 6px; display: none; font-size: 12px;
   }
-
-  .sort-btn { cursor: pointer; user-select: none; }
-  .sort-btn:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <div id="header">
   <div>
-    <h1>Reporte: Ignición activa durante carga de combustible</h1>
-    <span id="subtitle">Conectando a MyGeotab...</span>
+    <h1>Ignición activa durante carga de combustible</h1>
+    <span id="subtitle">Iniciando Add-In...</span>
   </div>
 </div>
 
 <div id="controls">
-  <label>Desde: <input type="date" id="dateFrom" /></label>
-  <label>Hasta: <input type="date" id="dateTo" /></label>
+  <label>Desde: <input type="date" id="dateFrom"></label>
+  <label>Hasta: <input type="date" id="dateTo"></label>
   <label>Vehículo:
     <select id="vehicleFilter"><option value="">Todos</option></select>
   </label>
@@ -144,26 +100,31 @@
       <option value="OK">Solo OK</option>
     </select>
   </label>
-  <button onclick="runReport()">&#9654; Ejecutar</button>
-  <button onclick="exportCSV()" style="background:#2d7a4f;">&#8595; Exportar CSV</button>
+  <button class="btn-run" id="btn-run" onclick="runReport()">&#9654; Ejecutar</button>
+  <button class="btn-csv" onclick="exportCSV()">&#8595; Exportar CSV</button>
+</div>
+
+<div id="status-bar">
+  <div class="spinner" id="spinner"></div>
+  <span id="status-text">Listo. Seleccioná un rango y ejecutá el reporte.</span>
 </div>
 
 <div id="error-msg"></div>
 <div id="kpis"></div>
+
 <div id="table-wrap">
-  <div id="loading">Cargando datos desde MyGeotab...</div>
-  <table id="report-table" style="display:none;">
+  <table id="report-table" style="display:none">
     <thead>
       <tr>
-        <th class="sort-btn" onclick="sortBy('plate')">Patente &#8597;</th>
-        <th class="sort-btn" onclick="sortBy('driver')">Conductor &#8597;</th>
-        <th class="sort-btn" onclick="sortBy('fuelTime')">Fecha/Hora Carga &#8597;</th>
+        <th onclick="sortBy('plate')">Patente &#8597;</th>
+        <th onclick="sortBy('driver')">Conductor &#8597;</th>
+        <th onclick="sortBy('fuelTime')">Fecha/Hora Carga &#8597;</th>
         <th>Litros</th>
-        <th class="sort-btn" onclick="sortBy('tripTime')">Último Viaje &#8597;</th>
-        <th>Fin Viaje</th>
+        <th onclick="sortBy('tripStart')">Último Viaje Iniciado &#8597;</th>
+        <th>Fin de Viaje</th>
         <th>Ignición</th>
-        <th>Odómetro (km)</th>
-        <th class="sort-btn" onclick="sortBy('status')">Estado &#8597;</th>
+        <th>Odómetro Carga</th>
+        <th onclick="sortBy('status')">Estado &#8597;</th>
       </tr>
     </thead>
     <tbody id="report-body"></tbody>
@@ -171,27 +132,23 @@
 </div>
 
 <script>
-var api;
-var allRows = [];
-var sortCol = '';
-var sortDir = 1;
+/* ─── globals ─────────────────────────────────────────────── */
+var _api;
+var allRows  = [];
+var sortCol  = 'fuelTime';
+var sortDir  = -1;
 
-var FUEL_EXCEPTION   = "FuelTransaction";
-var IGNITION_ON      = "IgnitionOn";
-var IGNITION_OFF     = "IgnitionOff";
-
-function setDates() {
-  var now = new Date();
-  var from = new Date(now);
-  from.setDate(from.getDate() - 7);
-  document.getElementById('dateFrom').value = from.toISOString().slice(0,10);
-  document.getElementById('dateTo').value   = now.toISOString().slice(0,10);
+/* ─── helpers ─────────────────────────────────────────────── */
+function setStatus(msg, loading) {
+  document.getElementById('status-text').textContent = msg;
+  document.getElementById('spinner').style.display = loading ? 'block' : 'none';
+  document.getElementById('btn-run').disabled = !!loading;
 }
 
 function showError(msg) {
   var el = document.getElementById('error-msg');
   el.style.display = 'block';
-  el.textContent = 'Error: ' + msg;
+  el.innerHTML = '<b>Error:</b> ' + msg;
 }
 
 function hideError() {
@@ -200,182 +157,146 @@ function hideError() {
 
 function fmtDate(d) {
   if (!d) return '—';
-  var dt = new Date(d);
-  return dt.toLocaleDateString('es-AR') + ' ' + dt.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
+  var dt = (d instanceof Date) ? d : new Date(d);
+  if (isNaN(dt)) return '—';
+  return dt.toLocaleDateString('es-AR') + ' ' +
+         dt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 }
 
-function diffMin(a, b) {
-  return Math.abs((new Date(a) - new Date(b)) / 60000);
+function isoDate(str, eod) {
+  return str + (eod ? 'T23:59:59.000Z' : 'T00:00:00.000Z');
 }
 
+function setDefaultDates() {
+  var now  = new Date();
+  var from = new Date(now);
+  from.setDate(from.getDate() - 7);
+  document.getElementById('dateTo').value   = now.toISOString().slice(0, 10);
+  document.getElementById('dateFrom').value = from.toISOString().slice(0, 10);
+}
+
+/* ─── api wrapper: returns a Promise ──────────────────────── */
+function apiGet(typeName, search) {
+  return new Promise(function(resolve, reject) {
+    _api.call('Get', { typeName: typeName, search: search },
+      function(result) { resolve(result); },
+      function(err)    { reject(err); }
+    );
+  });
+}
+
+/* ─── main report logic ────────────────────────────────────── */
 async function runReport() {
   hideError();
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('loading').textContent = 'Consultando GeoTab...';
+  allRows = [];
   document.getElementById('report-table').style.display = 'none';
   document.getElementById('kpis').innerHTML = '';
+  document.getElementById('report-body').innerHTML = '';
 
-  var dateFrom = document.getElementById('dateFrom').value + 'T00:00:00.000Z';
-  var dateTo   = document.getElementById('dateTo').value   + 'T23:59:59.000Z';
+  var fromVal = document.getElementById('dateFrom').value;
+  var toVal   = document.getElementById('dateTo').value;
+  if (!fromVal || !toVal) { showError('Seleccioná ambas fechas.'); return; }
+
+  var fromDate = isoDate(fromVal, false);
+  var toDate   = isoDate(toVal,   true);
   var vFilter  = document.getElementById('vehicleFilter').value;
 
   try {
-    // 1. Obtener excepciones de carga de combustible
-    var fuelSearch = {
-      typeName: 'ExceptionEvent',
-      search: {
-        fromDate: dateFrom,
-        toDate: dateTo,
-        ruleSearch: { name: FUEL_EXCEPTION }
-      }
-    };
+    /* 1 ── FuelTransactions ──────────────────────────────── */
+    setStatus('Consultando transacciones de combustible...', true);
 
-    var fuelEvents = await new Promise((res, rej) => {
-      api.call('Get', fuelSearch, res, rej);
-    });
+    var fuelSearch = { fromDate: fromDate, toDate: toDate };
+    if (vFilter) fuelSearch.deviceSearch = { id: vFilter };
 
-    document.getElementById('loading').textContent = 'Procesando ' + fuelEvents.length + ' cargas...';
+    var fuels = await apiGet('FuelTransaction', fuelSearch);
+    setStatus('Encontradas ' + fuels.length + ' cargas. Consultando viajes...', true);
 
-    // 2. Obtener eventos de ignición en el mismo rango
-    var ignSearch = {
-      typeName: 'StatusData',
-      search: {
-        fromDate: dateFrom,
-        toDate: dateTo,
-        diagnosticSearch: { id: 'DiagnosticIgnitionId' }
-      }
-    };
+    if (fuels.length === 0) {
+      setStatus('No hay cargas en el período seleccionado.', false);
+      return;
+    }
 
-    // Alternativa: usar ExceptionEvents de IgnitionOn / IgnitionOff
-    var tripSearch = {
-      typeName: 'Trip',
-      search: { fromDate: dateFrom, toDate: dateTo }
-    };
+    /* 2 ── Trips ─────────────────────────────────────────── */
+    var tripSearch = { fromDate: fromDate, toDate: toDate };
+    if (vFilter) tripSearch.deviceSearch = { id: vFilter };
 
-    var trips = await new Promise((res, rej) => {
-      api.call('Get', tripSearch, res, rej);
-    });
+    var trips = await apiGet('Trip', tripSearch);
+    setStatus('Procesando ' + trips.length + ' viajes...', true);
 
-    // 3. Para cada carga, buscar el último viaje del mismo vehículo previo a la carga
-    allRows = [];
-    for (var fe of fuelEvents) {
-      var vid   = fe.device ? fe.device.id : null;
-      var plate = fe.device ? (fe.device.name || vid) : '—';
-      var driver = (fe.driver && fe.driver.name) ? fe.driver.name : 'Sin asignar';
-      var fuelTime = fe.activeFrom;
-      var liters = (fe.data && fe.data.volume) ? parseFloat(fe.data.volume).toFixed(1) : '—';
+    /* 3 ── Vehicles (para nombre/patente) ───────────────── */
+    var deviceIds = [...new Set(fuels.map(function(f){ return f.device && f.device.id; }).filter(Boolean))];
+    var devices = {};
 
-      if (vFilter && vid !== vFilter) continue;
+    if (deviceIds.length > 0) {
+      var devResults = await apiGet('Device', { search: {} });
+      devResults.forEach(function(d){ devices[d.id] = d; });
+    }
 
-      // Viajes del mismo vehículo con inicio <= fuelTime
-      var vTrips = trips.filter(t =>
-        t.device && t.device.id === vid &&
-        new Date(t.start) <= new Date(fuelTime)
-      );
+    /* 4 ── Cruzar carga con último viaje previo ─────────── */
+    allRows = fuels.map(function(fuel) {
+      var vid      = fuel.device ? fuel.device.id : null;
+      var dev      = vid ? devices[vid] : null;
+      var plate    = dev ? (dev.licencePlate || dev.name || vid) : '—';
+      var driver   = (fuel.driver && fuel.driver.name) ? fuel.driver.name : 'Sin asignar';
+      var fuelTime = new Date(fuel.dateTime);
+      var liters   = fuel.volume != null ? parseFloat(fuel.volume).toFixed(1) : '—';
+      var odometer = fuel.odometer != null ? Math.round(fuel.odometer / 1000) : '—';
+
+      /* último viaje del mismo vehículo cuyo inicio <= fuelTime */
+      var vTrips = trips.filter(function(t) {
+        return t.device && t.device.id === vid && new Date(t.start) <= fuelTime;
+      });
 
       var lastTrip = null;
       if (vTrips.length > 0) {
-        lastTrip = vTrips.reduce((a, b) =>
-          new Date(a.start) > new Date(b.start) ? a : b
-        );
+        lastTrip = vTrips.reduce(function(a, b) {
+          return new Date(a.start) > new Date(b.start) ? a : b;
+        });
       }
 
       var ignStatus = '—';
+      var tripStart = null;
       var tripEnd   = '—';
       var status    = 'SIN_DATO';
 
       if (lastTrip) {
-        tripEnd = lastTrip.stop ? fmtDate(lastTrip.stop) : 'EN CURSO';
-        var noStop = !lastTrip.stop || new Date(lastTrip.stop) >= new Date(fuelTime);
-        ignStatus = noStop ? 'ON' : 'OFF';
-        status = (ignStatus === 'ON') ? 'RIESGO' : 'OK';
+        tripStart = new Date(lastTrip.start);
+        /* ignición ON si el viaje no tiene stop, o el stop es posterior a la carga */
+        var hasStop = lastTrip.stop && new Date(lastTrip.stop) < fuelTime;
+        ignStatus   = hasStop ? 'OFF' : 'ON';
+        tripEnd     = lastTrip.stop ? fmtDate(lastTrip.stop) : 'EN CURSO';
+        status      = ignStatus === 'ON' ? 'RIESGO' : 'OK';
       }
 
-      allRows.push({
-        plate, driver, fuelTime, liters,
-        tripTime: lastTrip ? lastTrip.start : null,
-        tripEnd, ignStatus, status,
-        odometer: lastTrip ? Math.round((lastTrip.distance || 0)) : '—'
-      });
-    }
+      return { plate, driver, fuelTime, liters, odometer,
+               tripStart, tripEnd, ignStatus, status, deviceId: vid };
+    });
 
-    renderTable();
+    /* 5 ── Poblar filtro de vehículos ───────────────────── */
+    populateVehicleFilter(fuels, devices);
+
     renderKpis();
-    loadVehicleFilter(fuelEvents);
+    renderTable();
+    setStatus('Reporte generado: ' + allRows.length + ' registros.', false);
 
   } catch(e) {
-    document.getElementById('loading').style.display = 'none';
-    showError(e.message || JSON.stringify(e));
+    setStatus('Error al consultar.', false);
+    showError(typeof e === 'string' ? e : (e.message || JSON.stringify(e)));
   }
 }
 
-function renderTable() {
-  var rows = filterRows();
-  var sf = document.getElementById('statusFilter').value;
-
-  var tbody = document.getElementById('report-body');
-  tbody.innerHTML = '';
-
-  rows.forEach(function(r) {
-    var ignBadge = r.ignStatus === 'ON'
-      ? '<span class="badge badge-red">ON</span>'
-      : r.ignStatus === 'OFF'
-        ? '<span class="badge badge-green">OFF</span>'
-        : '<span class="badge badge-gray">—</span>';
-
-    var stBadge = r.status === 'RIESGO'
-      ? '<span class="badge badge-red">⚠ RIESGO</span>'
-      : r.status === 'OK'
-        ? '<span class="badge badge-green">✔ OK</span>'
-        : '<span class="badge badge-amber">Sin dato</span>';
-
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td><b>' + r.plate + '</b></td>' +
-      '<td>' + r.driver + '</td>' +
-      '<td>' + fmtDate(r.fuelTime) + '</td>' +
-      '<td>' + r.liters + ' L</td>' +
-      '<td>' + (r.tripTime ? fmtDate(r.tripTime) : '—') + '</td>' +
-      '<td>' + r.tripEnd + '</td>' +
-      '<td>' + ignBadge + '</td>' +
-      '<td>' + (r.odometer !== '—' ? r.odometer.toLocaleString('es-AR') + ' km' : '—') + '</td>' +
-      '<td>' + stBadge + '</td>';
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('report-table').style.display = rows.length ? 'table' : 'none';
-  if (!rows.length) {
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('loading').textContent = 'Sin resultados para los filtros seleccionados.';
-  }
-}
-
-function filterRows() {
-  var sf = document.getElementById('statusFilter').value;
-  var rows = allRows.slice();
-  if (sf) rows = rows.filter(function(r){ return r.status === sf; });
-  if (sortCol) {
-    rows.sort(function(a,b){
-      var va = a[sortCol] || '';
-      var vb = b[sortCol] || '';
-      return va < vb ? -sortDir : va > vb ? sortDir : 0;
-    });
-  }
-  return rows;
-}
-
+/* ─── render ──────────────────────────────────────────────── */
 function renderKpis() {
-  var total   = allRows.length;
-  var riesgo  = allRows.filter(function(r){ return r.status === 'RIESGO'; }).length;
-  var ok      = allRows.filter(function(r){ return r.status === 'OK'; }).length;
-  var pct     = total ? Math.round(riesgo / total * 100) : 0;
+  var total  = allRows.length;
+  var riesgo = allRows.filter(function(r){ return r.status === 'RIESGO'; }).length;
+  var ok     = allRows.filter(function(r){ return r.status === 'OK'; }).length;
+  var pct    = total ? Math.round(riesgo / total * 100) : 0;
 
   document.getElementById('kpis').innerHTML =
-    kpiCard('Total cargas', total, 'blue') +
-    kpiCard('Con ignición ON', riesgo, 'red') +
-    kpiCard('Sin ignición ON', ok, 'green') +
-    kpiCard('% Riesgo', pct + '%', 'amber');
+    kpiCard('Total cargas', total,       'blue')  +
+    kpiCard('Con ignición ON', riesgo,   'red')   +
+    kpiCard('Sin ignición ON', ok,       'green') +
+    kpiCard('% Riesgo', pct + '%',       'amber');
 }
 
 function kpiCard(label, value, cls) {
@@ -385,19 +306,52 @@ function kpiCard(label, value, cls) {
     '</div>';
 }
 
-function loadVehicleFilter(fuelEvents) {
-  var seen = {};
-  var sel = document.getElementById('vehicleFilter');
-  sel.innerHTML = '<option value="">Todos</option>';
-  fuelEvents.forEach(function(fe){
-    if (fe.device && !seen[fe.device.id]) {
-      seen[fe.device.id] = true;
-      var opt = document.createElement('option');
-      opt.value = fe.device.id;
-      opt.textContent = fe.device.name || fe.device.id;
-      sel.appendChild(opt);
-    }
+function renderTable() {
+  var rows = getFilteredSorted();
+  var tbody = document.getElementById('report-body');
+  tbody.innerHTML = '';
+
+  rows.forEach(function(r) {
+    var ignBadge = r.ignStatus === 'ON'  ? '<span class="badge b-red">ON</span>'
+                 : r.ignStatus === 'OFF' ? '<span class="badge b-green">OFF</span>'
+                 : '<span class="badge b-gray">—</span>';
+
+    var stBadge  = r.status === 'RIESGO'   ? '<span class="badge b-red">⚠ RIESGO</span>'
+                 : r.status === 'OK'        ? '<span class="badge b-green">✔ OK</span>'
+                 : '<span class="badge b-amber">Sin dato</span>';
+
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><b>' + r.plate + '</b></td>' +
+      '<td>' + r.driver + '</td>' +
+      '<td>' + fmtDate(r.fuelTime) + '</td>' +
+      '<td>' + r.liters + ' L</td>' +
+      '<td>' + (r.tripStart ? fmtDate(r.tripStart) : '—') + '</td>' +
+      '<td>' + r.tripEnd + '</td>' +
+      '<td>' + ignBadge + '</td>' +
+      '<td>' + (r.odometer !== '—' ? r.odometer.toLocaleString('es-AR') + ' km' : '—') + '</td>' +
+      '<td>' + stBadge + '</td>';
+    tbody.appendChild(tr);
   });
+
+  var tbl = document.getElementById('report-table');
+  tbl.style.display = rows.length ? 'table' : 'none';
+}
+
+function getFilteredSorted() {
+  var sf   = document.getElementById('statusFilter').value;
+  var rows = allRows.slice();
+  if (sf) rows = rows.filter(function(r){ return r.status === sf; });
+  if (sortCol) {
+    rows.sort(function(a, b) {
+      var va = a[sortCol] != null ? a[sortCol] : '';
+      var vb = b[sortCol] != null ? b[sortCol] : '';
+      if (va instanceof Date) va = va.getTime();
+      if (vb instanceof Date) vb = vb.getTime();
+      return va < vb ? -sortDir : va > vb ? sortDir : 0;
+    });
+  }
+  return rows;
 }
 
 function sortBy(col) {
@@ -405,35 +359,59 @@ function sortBy(col) {
   renderTable();
 }
 
-function exportCSV() {
-  var rows = filterRows();
-  var lines = [['Patente','Conductor','Fecha Carga','Litros','Ultimo Viaje','Fin Viaje','Ignicion','Odometro','Estado']];
-  rows.forEach(function(r){
-    lines.push([r.plate, r.driver, fmtDate(r.fuelTime), r.liters,
-      r.tripTime ? fmtDate(r.tripTime) : '', r.tripEnd,
-      r.ignStatus, r.odometer, r.status]);
+function populateVehicleFilter(fuels, devices) {
+  var seen = {};
+  var sel  = document.getElementById('vehicleFilter');
+  var current = sel.value;
+  sel.innerHTML = '<option value="">Todos</option>';
+  fuels.forEach(function(f) {
+    if (f.device && !seen[f.device.id]) {
+      seen[f.device.id] = true;
+      var dev = devices[f.device.id];
+      var opt = document.createElement('option');
+      opt.value       = f.device.id;
+      opt.textContent = dev ? (dev.licencePlate || dev.name || f.device.id) : f.device.id;
+      if (opt.value === current) opt.selected = true;
+      sel.appendChild(opt);
+    }
   });
-  var csv = lines.map(function(l){ return l.join(';'); }).join('\n');
-  var a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
-  a.download = 'ignicion_en_carga.csv';
+}
+
+/* ─── export CSV ──────────────────────────────────────────── */
+function exportCSV() {
+  var rows = getFilteredSorted();
+  if (!rows.length) { showError('No hay datos para exportar.'); return; }
+  var lines = [['Patente','Conductor','Fecha Carga','Litros','Ultimo Viaje Iniciado',
+                'Fin Viaje','Ignicion','Odometro (km)','Estado'].join(';')];
+  rows.forEach(function(r) {
+    lines.push([
+      r.plate, r.driver, fmtDate(r.fuelTime), r.liters,
+      r.tripStart ? fmtDate(r.tripStart) : '',
+      r.tripEnd, r.ignStatus, r.odometer, r.status
+    ].join(';'));
+  });
+  var csv = lines.join('\n');
+  var a   = document.createElement('a');
+  a.href  = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'ignicion_en_carga_' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
 }
 
-// ── INICIALIZACIÓN GEOTAB ──────────────────────────────────────────
-if (typeof geotab !== 'undefined') {
-  geotab.addin.ignicionEnCarga = function(elt, _api) {
-    api = _api;
-    document.getElementById('subtitle').textContent = 'Reporte activo en MyGeotab';
-    setDates();
-    runReport();
-  };
-} else {
-  document.getElementById('subtitle').textContent = 'Vista previa — fuera de MyGeotab';
-  document.getElementById('loading').textContent =
-    'Este reporte debe ejecutarse dentro de MyGeotab. Subilo como Add-In personalizado.';
-  setDates();
-}
+/* ─── filtro en tiempo real ───────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('statusFilter').addEventListener('change', function() {
+    if (allRows.length) renderTable();
+  });
+});
+
+/* ─── GEOTAB ADD-IN ENTRY POINT ───────────────────────────── */
+geotab.addin.ignicionEnCarga = function(elt, api) {
+  _api = api;
+  document.getElementById('subtitle').textContent =
+    'Base: intcesetti  |  my.geotab.com';
+  setDefaultDates();
+  setStatus('Listo. Seleccioná un rango y ejecutá el reporte.', false);
+};
 </script>
 </body>
 </html>
